@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Sum, F
 from .models import InventoryItem
+from django.shortcuts import render
 
 
 # -----------------------------
@@ -81,3 +82,8 @@ class InventoryReport(APIView):
             "total_quantity": total_quantity,
             "total_inventory_value": total_value
         })
+    from django.shortcuts import render
+
+def inventory_test_view(request):
+    return render(request, 'inventory_test.html')
+
