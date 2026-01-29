@@ -22,16 +22,12 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
+from inventory import views
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
+  path('admin/', admin.site.urls),
+    path('', views.inventory_test_view, name='home'),  # <- updated
     path('api/', include('inventory.urls')),
-    path('', views.home, name='home'),
-    
-
-    # JWT endpoints
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    # Test page outside /api/
-    path('test_inventory/', views.inventory_test_view, name='inventory-test'),
-
+    path('admin/', admin.site.urls),
 ]
+
