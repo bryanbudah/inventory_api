@@ -23,6 +23,10 @@ ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
 ]
+# CSRF Trusted Origins (for POST requests/forms)
+CSRF_TRUSTED_ORIGINS = [
+    "https://inventory-api-2-twjy.onrender.com",  # Replace with your Render URL
+]
 
 # --------------------------------------------------
 # APPLICATIONS
@@ -90,9 +94,10 @@ TEMPLATES = [
 # DATABASE
 # --------------------------------------------------
 DATABASES = {
-    'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+   'default': dj_database_url.config(
+        default=os.environ.get("postgresql://inventory_db_g48z_user:EKk4VvUG3gxHDJGwsuKkbfapFDuOCD5h@dpg-d5ualrsoud1c738hs2v0-a/inventory_db_g48z"),  # <-- Use your Render Postgres URL here
         conn_max_age=600,
+  
     )
 }
 
