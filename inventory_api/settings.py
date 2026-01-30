@@ -1,9 +1,10 @@
 """
 Django settings for inventory_api project.
+Render-ready version.
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
 import dj_database_url
 
 # --------------------------------------------------
@@ -14,50 +15,56 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # --------------------------------------------------
 # SECURITY
 # --------------------------------------------------
-SECRET_KEY = os.getenv("SECRET_KEY", "dev-key-for-local-only")
+SECRET_KEY = os.environ.get("SECRET_KEY", "dev-key-for-local-only")
 
-DEBUG = False
+# DEBUG
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
+# ALLOWED HOSTS
 ALLOWED_HOSTS = [
-    "inventory-api-copy.onrender.com",
+    "inventory-api-copy.onrender.com",  # Your Render URL
     "localhost",
     "127.0.0.1",
 ]
+
 # CSRF Trusted Origins (for POST requests/forms)
 CSRF_TRUSTED_ORIGINS = [
-    "https://inventory-api-2-twjy.onrender.com",  # Replace with your Render URL
+    "https://inventory-api-copy.onrender.com",  # Your Render URL
 ]
 
 # --------------------------------------------------
 # APPLICATIONS
 # --------------------------------------------------
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    # Django
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
 
     # Third-party
-    'rest_framework',
-    'corsheaders',
+    "rest_framework",
+    "corsheaders",
 
-    # Local
-    'inventory',
+    # Local apps
+    "inventory",
 ]
 
 # --------------------------------------------------
 # MIDDLEWARE
 # --------------------------------------------------
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # For static files on Render
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
 # --------------------------------------------------
@@ -69,35 +76,35 @@ CORS_ALLOW_CREDENTIALS = True
 # --------------------------------------------------
 # URLS & WSGI
 # --------------------------------------------------
-ROOT_URLCONF = 'inventory_api.urls'
-WSGI_APPLICATION = 'inventory_api.wsgi.application'
+ROOT_URLCONF = "inventory_api.urls"
+WSGI_APPLICATION = "inventory_api.wsgi.application"
 
 # --------------------------------------------------
 # TEMPLATES
 # --------------------------------------------------
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],  # Add your templates folder if any
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
-    },
+    }
 ]
 
 # --------------------------------------------------
 # DATABASE
 # --------------------------------------------------
 DATABASES = {
-   'default': dj_database_url.config(
-        default=os.environ.get("postgresql://inventory_db_g48z_user:EKk4VvUG3gxHDJGwsuKkbfapFDuOCD5h@dpg-d5ualrsoud1c738hs2v0-a/inventory_db_g48z"),  # <-- Use your Render Postgres URL here
+    "default": dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",  # Fallback for local dev
         conn_max_age=600,
-  
     )
 }
 
@@ -105,26 +112,32 @@ DATABASES = {
 # DRF
 # --------------------------------------------------
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
     ],
 }
 
 # --------------------------------------------------
 # INTERNATIONALIZATION
 # --------------------------------------------------
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+LANGUAGE_CODE = "en-us"
+TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
 # --------------------------------------------------
 # STATIC FILES
 # --------------------------------------------------
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# --------------------------------------------------
+# MEDIA FILES
+# --------------------------------------------------
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 # --------------------------------------------------
 # DEFAULT PRIMARY KEY
 # --------------------------------------------------
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
