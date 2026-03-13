@@ -1,139 +1,122 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Inventory API Test - Full</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    input, textarea { width: 300px; margin: 5px 0; display: block; }
-    button { margin: 5px 0; }
-    pre { background: #f4f4f4; padding: 10px; border-radius: 5px; white-space: pre-wrap; }
-    hr { margin: 20px 0; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inventory Management</title>
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <h1>Inventory API Test - Full</h1>
+<body class="bg-gray-100 min-h-screen">
 
-  <label>JWT Access Token:</label>
-  <input type="text" id="token" placeholder="Paste your access token here">
+<header class="bg-blue-600 text-white p-4 text-center">
+    <h1 class="text-2xl font-bold">📦 Inventory Management</h1>
+</header>
 
-  <h2>Actions</h2>
-  <button onclick="loadItems()">GET All Items</button>
-  <button onclick="addAllItems()">Add All Example Items</button>
+<main class="max-w-5xl mx-auto p-6">
 
-  <hr>
-  <h2>Create New Item</h2>
-  <input id="name" placeholder="Name">
-  <input id="description" placeholder="Description">
-  <input id="quantity" type="number" placeholder="Quantity">
-  <input id="price" type="number" step="0.01" placeholder="Price">
-  <input id="category" placeholder="Category">
-  <button onclick="createItem()">POST /api/items/</button>
+<section class="bg-white p-4 rounded shadow mb-6">
+    <h2 id="formTitle" class="text-xl font-semibold mb-4">Add Inventory Item</h2>
+    <form id="itemForm" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <input type="hidden" id="itemId">
+        <input id="name" type="text" placeholder="Item name" class="border p-2 rounded" required>
+        <input id="quantity" type="number" placeholder="Quantity" class="border p-2 rounded" required>
+        <input id="price" type="number" placeholder="Price" class="border p-2 rounded" required>
+        <button type="submit" class="bg-blue-600 text-white rounded px-4 py-2 hover:bg-blue-700">Save</button>
+    </form>
+</section>
 
-  <hr>
-  <h2>Update Item</h2>
-  <input id="update_id" placeholder="Item ID">
-  <input id="update_name" placeholder="New Name">
-  <input id="update_quantity" type="number" placeholder="New Quantity">
-  <button onclick="updateItem()">PUT /api/items/&lt;id&gt;/</button>
+<section class="bg-white p-4 rounded shadow">
+    <h2 class="text-xl font-semibold mb-4">Inventory Items</h2>
+    <table class="w-full border-collapse">
+        <thead>
+            <tr class="bg-gray-200">
+                <th class="p-2 text-left">Name</th>
+                <th class="p-2 text-left">Quantity</th>
+                <th class="p-2 text-left">Price</th>
+                <th class="p-2 text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody id="inventoryTable"></tbody>
+    </table>
+</section>
 
-  <hr>
-  <h2>Delete Item</h2>
-  <input id="delete_id" placeholder="Item ID">
-  <button onclick="deleteItem()">DELETE /api/items/&lt;id&gt;/</button>
+</main>
 
-  <hr>
-  <h2>Output</h2>
-  <pre id="output"></pre>
+<script>
+const API_URL = "http://127.0.0.1:8000/api/items/";
+const tableBody = document.getElementById("inventoryTable");
+const form = document.getElementById("itemForm");
+const formTitle = document.getElementById("formTitle");
+const itemIdInput = document.getElementById("itemId");
+const nameInput = document.getElementById("name");
+const quantityInput = document.getElementById("quantity");
+const priceInput = document.getElementById("price");
 
-  <script>
-    const baseUrl = "http://127.0.0.1:8000/api/items/";
-
-    function getHeaders() {
-      let token = document.getElementById("token").value.trim();
-      if (!token.startsWith("Bearer ")) {
-        token = "Bearer " + token;
-      }
-      return {
-        "Authorization": token,
-        "Content-Type": "application/json"
-      };
-    }
-
-    async function loadItems() {
-      try {
-        const res = await fetch(baseUrl, { headers: getHeaders() });
+async function loadItems() {
+    try {
+        const res = await fetch(API_URL);
+        if (!res.ok) {
+            console.error("Fetch failed:", res.status, res.statusText);
+            return;
+        }
         const data = await res.json();
-        document.getElementById("output").textContent = JSON.stringify(data, null, 2);
-      } catch (err) {
-        document.getElementById("output").textContent = err;
-      }
-    }
-
-    async function createItem() {
-      const body = {
-        name: document.getElementById("name").value,
-        description: document.getElementById("description").value,
-        quantity: parseInt(document.getElementById("quantity").value),
-        price: parseFloat(document.getElementById("price").value),
-        category: document.getElementById("category").value
-      };
-      const res = await fetch(baseUrl, {
-        method: "POST",
-        headers: getHeaders(),
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      document.getElementById("output").textContent = JSON.stringify(data, null, 2);
-      loadItems();
-    }
-
-    async function updateItem() {
-      const id = document.getElementById("update_id").value;
-      const body = {
-        name: document.getElementById("update_name").value,
-        quantity: parseInt(document.getElementById("update_quantity").value)
-      };
-      const res = await fetch(baseUrl + id + "/", {
-        method: "PUT",
-        headers: getHeaders(),
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
-      document.getElementById("output").textContent = JSON.stringify(data, null, 2);
-      loadItems();
-    }
-
-    async function deleteItem() {
-      const id = document.getElementById("delete_id").value;
-      const res = await fetch(baseUrl + id + "/", {
-        method: "DELETE",
-        headers: getHeaders()
-      });
-      document.getElementById("output").textContent = res.status + " " + res.statusText;
-      loadItems();
-    }
-
-    async function addAllItems() {
-      const items = [
-        { "name": "Laptop", "description": "High-end gaming laptop", "quantity": 5, "price": 2500.00, "category": "Electronics" },
-        { "name": "Office Chair", "description": "Ergonomic swivel chair", "quantity": 10, "price": 150.00, "category": "Furniture" },
-        { "name": "Notebook", "description": "200-page ruled notebook", "quantity": 50, "price": 3.50, "category": "Stationery" },
-        { "name": "Desk Lamp", "description": "LED desk lamp with adjustable brightness", "quantity": 15, "price": 45.00, "category": "Electronics" },
-        { "name": "Water Bottle", "description": "1-liter stainless steel bottle", "quantity": 30, "price": 12.00, "category": "Kitchenware" }
-      ];
-
-      for (const item of items) {
-        const res = await fetch(baseUrl, {
-          method: "POST",
-          headers: getHeaders(),
-          body: JSON.stringify(item)
+        const items = Array.isArray(data) ? data : data.results ?? [];
+        tableBody.innerHTML = "";
+        items.forEach(item => {
+            tableBody.innerHTML += `
+            <tr class="border-b">
+                <td class="p-2">${item.name}</td>
+                <td class="p-2">${item.quantity}</td>
+                <td class="p-2">${item.price}</td>
+                <td class="p-2 text-center space-x-2">
+                    <button onclick="editItem(${item.id})" class="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600">Edit</button>
+                    <button onclick="deleteItem(${item.id})" class="bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700">Delete</button>
+                </td>
+            </tr>
+            `;
         });
-        const data = await res.json();
-        document.getElementById("output").textContent += JSON.stringify(data, null, 2) + "\n";
-      }
-
-      loadItems();
+    } catch (err) {
+        console.error("Error loading items:", err);
     }
-  </script>
+}
+
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const itemData = { name: nameInput.value, quantity: quantityInput.value, price: priceInput.value };
+    const itemId = itemIdInput.value;
+    if (itemId) {
+        await fetch(`${API_URL}${itemId}/`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(itemData) });
+    } else {
+        await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(itemData) });
+    }
+    resetForm();
+    loadItems();
+});
+
+async function editItem(id) {
+    const res = await fetch(`${API_URL}${id}/`);
+    const item = await res.json();
+    itemIdInput.value = item.id;
+    nameInput.value = item.name;
+    quantityInput.value = item.quantity;
+    priceInput.value = item.price;
+    formTitle.textContent = "Edit Inventory Item";
+}
+
+async function deleteItem(id) {
+    if (!confirm("Are you sure you want to delete this item?")) return;
+    await fetch(`${API_URL}${id}/`, { method: "DELETE" });
+    loadItems();
+}
+
+function resetForm() {
+    form.reset();
+    itemIdInput.value = "";
+    formTitle.textContent = "Add Inventory Item";
+}
+
+loadItems();
+</script>
+
 </body>
 </html>
