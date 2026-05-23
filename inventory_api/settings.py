@@ -21,12 +21,15 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "dev-key-for-local-only")
 DEBUG = os.environ.get("DEBUG", "False") == "True"
 
 # ALLOWED HOSTS
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS =  [
+    "inventory-api-3-4521.onrender.com",
+    ".onrender.com",
+]
 
 # CSRF Trusted Origins (for POST requests/forms)
 CSRF_TRUSTED_ORIGINS = [
      
-    "https://inventory-api-copy.onrender.com",
+      "https://inventory-api-3-4521.onrender.com",
 ],  # Your Render URL
 
 
