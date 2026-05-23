@@ -28,9 +28,8 @@ ALLOWED_HOSTS =  [
 
 # CSRF Trusted Origins (for POST requests/forms)
 CSRF_TRUSTED_ORIGINS = [
-     
-      "https://inventory-api-3-4521.onrender.com",
-],  # Your Render URL
+    "https://inventory-api-3-4521.onrender.com",
+]# Your Render URL
 
 
 # --------------------------------------------------
