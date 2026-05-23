@@ -28,6 +28,5 @@ urlpatterns = [
   path('admin/', admin.site.urls),
     path('', views.inventory_test_view, name='home'),  # <- updated
     path('api/', include('inventory.urls')),
-    path('admin/', admin.site.urls),
-]
+    ]
 
